@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat WebSocket</title>
+  <link rel="stylesheet" href="index.css">
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Chat WebSocket</h1>
+    <div id="usuarios" style="margin-bottom:1em; text-align:left; font-size:0.98em; color:#1976d2;"></div>
+    <div id="messages"></div>
+    <input type="text" id="input" placeholder="Escribe un mensaje..." autofocus />
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
+  <script>
+    let username = '';
+    while (!username) {
+      username = prompt('Ingresa tu nombre de usuario:');
+      if (username) username = username.trim();
+    }
+    const socket = io('http://localhost:3010');
+    const messages = document.getElementById('messages');
+    const input = document.getElementById('input');
+    const usuarios = document.getElementById('usuarios');
+    socket.on('user_list', (userList) => {
+      usuarios.innerHTML = '<b>Usuarios conectados:</b><br>' + userList.map(u => `• ${u}`).join('<br>');
+    });
+
+    socket.on('connect', () => {
+      socket.emit('user_joined', username);
+      appendMessage(`Te has unido como ${username}`);
+    });
+    socket.on('disconnect', () => {
+      appendMessage('Desconectado del servidor.');
+    });
+    socket.on('message', (msg) => {
+      appendMessage(msg);
+    });
+    socket.on('user_joined', (name) => {
+      if (name !== username) appendMessage(`${name} se ha unido al chat.`);
+    });
+    socket.on('user_left', (name) => {
+      appendMessage(`${name} ha salido del chat.`);
+    });
+    function sendMessage() {
+      if (input.value.trim() !== '') {
+        socket.emit('message', `${username}: ${input.value}`);
+        input.value = '';
+      }
+    }
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') sendMessage();
+    });
+    function appendMessage(msg) {
+      const div = document.createElement('div');
+      div.textContent = msg;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+    window.addEventListener('beforeunload', function() {
+      socket.emit('user_left', username);
+    });
+  </script>
+</body>
+</html>

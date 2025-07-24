@@ -1,0 +1,78 @@
+Proyecto de Microservicios NestJS
+Este proyecto está dividido en tres partes principales: el API Gateway (implementacion), el microservicio de hora (microservicio-hora) y varios microservicios adicionales (libros, matemáticas, chat) que se comunican entre sí usando TCP y WebSocket.
+
+Instalación y preparación
+Instala Node.js y npm
+Descarga e instala Node.js desde nodejs.org.
+
+Instala las dependencias del proyecto
+Abre una terminal en la carpeta raíz del proyecto y ejecuta:
+
+Haz esto en cada carpeta de microservicio si están separadas.
+
+Variables de entorno
+Verifica que el archivo .env tenga el transporte TCP y los puertos correctos:
+
+¿Cómo funciona?
+API Gateway (implementacion):
+Es el backend principal. Aquí llegan las peticiones HTTP y GraphQL. El gateway recibe las solicitudes y, si es necesario, las envía a los microservicios por TCP para obtener datos o realizar acciones.
+
+Microservicio de hora (microservicio-hora):
+Es un servicio independiente que responde con la hora actual cuando se le pide. El gateway le pregunta la hora usando TCP y muestra el resultado en un endpoint.
+
+Microservicio de libros:
+Permite consultar y agregar libros. El gateway se comunica con él por TCP y expone los datos por HTTP y GraphQL.
+
+Microservicio de matemáticas (prueba):
+Solo sirve para probar operaciones como suma y multiplicación. No es esencial para el funcionamiento, pero muestra cómo se pueden agregar más servicios.
+
+Microservicio de chat (WebSocket):
+Permite que varios usuarios se conecten y chateen en tiempo real. Usa WebSocket y TCP para la comunicación y para verificar que está activo.
+
+Puertos usados
+API Gateway: 3000
+Libros: 3002
+Hora: 3003
+Matemáticas (prueba): 3006
+Chat (WebSocket): 3010
+Cada microservicio debe ejecutarse en su propia terminal y en el puerto indicado.
+
+¿Cómo ejecutar cada microservicio?
+API Gateway:
+Desde la carpeta implementacion ejecuta:
+
+Microservicio de hora:
+Ve a la carpeta microservicio-hora y ejecuta:
+
+Microservicio de libros:
+Desde la carpeta implementacion ejecuta:
+
+Microservicio de matemáticas (prueba):
+Desde la carpeta implementacion ejecuta:
+
+Microservicio de chat (WebSocket):
+Desde la carpeta implementacion ejecuta:
+
+¿Cómo probar en Postman?
+Verifica que todos los microservicios estén corriendo.
+Prueba los endpoints del gateway:
+GET http://localhost:3000/hora
+Devuelve la hora actual (respuesta del microservicio de hora).
+GET http://localhost:3000/books
+Devuelve la lista de libros.
+GET http://localhost:3000/math-health
+Verifica si el microservicio de matemáticas está activo.
+GET http://localhost:3000/chat-health
+Verifica si el microservicio de chat está activo.
+Ejemplo de respuesta para /hora:
+
+Ejemplo de respuesta para /chat-health:
+
+Conexiones y comunicación
+El gateway se conecta a los microservicios usando TCP (puertos indicados arriba).
+El chat usa WebSocket para la comunicación en tiempo real entre clientes.
+Los microservicios responden a comandos específicos (por ejemplo, { cmd: 'get_time' } para la hora).
+Para probar el chat, abre el archivo index.html en tu navegador y conecta varios usuarios.
+Consejos
+Si algo no funciona, revisa que todos los microservicios estén corriendo y que los puertos no estén ocupados por otros programas.
+El transporte TCP debe estar configurado igual en todos los servicios (variable TRANSPORT=TCP en el .env).
